@@ -15,7 +15,7 @@ app.get('/twitch/:channel', (req, res) => {
 
     const m3u8 = stdout.trim();
     const encoded = Buffer.from(m3u8).toString('base64');
-    const proxyUrl = `http://localhost:3000/proxy/${encoded}.m3u8`; // HLSD must be running here
+    const proxyUrl = `http://localhost:3000/${encoded}.m3u8`; // HLSD must be running here
 
     return res.json({ proxy: proxyUrl });
   });
