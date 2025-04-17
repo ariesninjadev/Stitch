@@ -3,7 +3,7 @@
 <script>
   const channel = prompt("Channel?");
 
-  fetch(`http://50.39.184.15:3001/twitch/${channel}`)
+  fetch(`https://api.ninjam.us:3001/twitch/${channel}`)
     .then(res => res.json())
     .then(data => {
       const hls = new Hls();
