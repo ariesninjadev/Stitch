@@ -1,168 +1,259 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <title>Stitch - Login</title>
-    <link rel="stylesheet" href="../resources/css/main.css" />
-    <style>
-        .login-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 80vh;
-            max-width: 500px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        .logo {
-            margin-bottom: 3rem;
-            text-align: center;
-        }
-
-        .logo h1 {
-            font-size: 3rem;
-            margin-bottom: 0.5rem;
-            color: #47ffa9;
-        }
-
-        .logo p {
-            color: #aaa;
-            font-size: 1.1rem;
-        }
-
-        .login-card {
-            background-color: rgba(30, 30, 35, 0.7);
-            border: 1px solid #444;
-            border-radius: 12px;
-            padding: 2.5rem;
-            width: 100%;
-            text-align: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .login-title {
-            margin-bottom: 2rem;
-            font-size: 1.5rem;
-            color: #eee;
-        }
-
-        .login-button {
-            background-color: #47ffa9;
-            color: #0e0e10;
-            border: none;
-            padding: 0.8rem 2rem;
-            font-size: 1.1rem;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .login-button:hover {
-            background-color: #3ad890;
-            transform: translateY(-2px);
-        }
-
-        .footer-text {
-            margin-top: 2.5rem;
-            font-size: 0.9rem;
-            color: #888;
-        }
-
-        .footer-text a {
-            color: #47ffa9;
-            text-decoration: none;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Stitch - Login</title>
+  <link rel="stylesheet" href="../resources/css/main.css"/>
+  <style>
+    .login-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 80vh;
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    .logo {
+      margin-bottom: 3rem;
+      text-align: center;
+    }
+    
+    .logo h1 {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+      color: #47ffa9;
+    }
+    
+    .logo p {
+      color: #aaa;
+      font-size: 1.1rem;
+    }
+    
+    .login-card {
+      background-color: rgba(30, 30, 35, 0.7);
+      border: 1px solid #444;
+      border-radius: 12px;
+      padding: 2.5rem;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .login-title {
+      margin-bottom: 2rem;
+      font-size: 1.5rem;
+      color: #eee;
+    }
+    
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    
+    .input-group {
+      width: 100%;
+    }
+    
+    .email-input {
+      width: calc(100% - 2rem);
+      background-color: rgba(14, 14, 16, 0.7);
+      border: 1px solid #555;
+      color: #eee;
+      padding: 0.8rem 1rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+    
+    .email-input:focus {
+      outline: none;
+      border-color: #47ffa9;
+      box-shadow: 0 0 0 2px rgba(71, 255, 169, 0.2);
+    }
+    
+    .login-button {
+      background-color: #47ffa9;
+      color: #0e0e10;
+      border: none;
+      padding: 0.8rem 2rem;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    
+    .login-button:hover {
+      background-color: #3ad890;
+      transform: translateY(-2px);
+    }
+    
+    .footer-text {
+      margin-top: 2.5rem;
+      font-size: 0.9rem;
+      color: #888;
+    }
+    
+    .footer-text a {
+      color: #47ffa9;
+      text-decoration: none;
+    }
+    
+    .status-message {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: #47ffa9;
+      min-height: 1.2rem;
+    }
+  </style>
 </head>
-
 <body>
-    <div class="login-container">
-        <div class="logo">
-            <h1>Stitch</h1>
-            <p>Your personal stream experience</p>
-        </div>
-
-        <div class="login-card">
-            <h2 class="login-title">Sign in to continue</h2>
-
-            <button id="login-button" class="login-button">
-                Login with NJM
-            </button>
-
-            <p class="footer-text">
-                By signing in, you agree to our <a href="https://sso.ninjam.us/tos">Terms of Service</a>
-            </p>
-        </div>
+  <div class="login-container">
+    <div class="logo">
+      <h1>Stitch</h1>
+      <p>Your streamlined viewing experience</p>
     </div>
-
-    <script>
-
-        class NJMAuth {
-            constructor() {
-                this.authPlatformURL = 'https://sso.ninjam.us';
-            }
-
-            doSignIn() {
-                return new Promise((resolve, reject) => {
-                    const width = 600;
-                    const height = 800;
-                    const left = (screen.width - width) / 2;
-                    const top = (screen.height - height) / 2;
-                    const popup = window.open(
-                        this.authPlatformURL + `/flow?origin=${encodeURIComponent(origin)}`,
-                        '_popup',
-                        `width=${width},height=${height},left=${left},top=${top}`
-                    );
-
-                    if (!popup) {
-                        reject(new Error('Failed to open popup window. It may have been blocked.'));
-                        return;
-                    }
-
-                    const messageHandler = (event) => {
-                        if (event.origin !== this.authPlatformURL) return;
-
-                        if (event.data.type === 'READY_FOR_CONTEXT') {
-                            popup.postMessage({ type: 'AUTH_CONTEXT' }, this.authPlatformURL);
-                            return;
-                        }
-
-                        if (event.data.type === 'AUTH_SUCCESS') {
-                            window.removeEventListener('message', messageHandler);
-                            popup.close();
-                            resolve(event.data.user);
-                        }
-                    };
-
-                    window.addEventListener('message', messageHandler);
-
-                });
-            }
+    
+    <div class="login-card">
+      <h2 class="login-title">Sign in to continue</h2>
+      
+      <form id="login-form" class="login-form">
+        <div class="input-group">
+          <input 
+            type="email" 
+            id="email-input" 
+            class="email-input" 
+            placeholder="Enter your email address" 
+            required
+            autocomplete="email"
+          >
+        </div>
+        
+        <div class="input-group">
+          <button type="submit" id="login-button" class="login-button">
+            Continue
+          </button>
+        </div>
+        
+        <div id="status-message" class="status-message"></div>
+      </form>
+      
+      <p class="footer-text">
+        By signing in, you agree to our <a href="/terms">Terms of Service</a>
+      </p>
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const loginForm = document.getElementById('login-form');
+      const emailInput = document.getElementById('email-input');
+      const statusMessage = document.getElementById('status-message');
+      
+      loginForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        const email = emailInput.value.trim();
+        
+        if (email) {
+          statusMessage.textContent = 'Logging in...';
+          localStorage.setItem('uid', email); // Store email in local storage
+          setTimeout(() => {
+            // Redirect to the main page after successful login
+            window.location.href = '/';
+          }, 600);
+        } else {
+          statusMessage.textContent = 'Please enter a valid email address.';
         }
+      });
+    });
 
-        // const njmAuth = new NJMAuth();
-        // njmAuth.doSignIn().then((user) => {
-        //     console.log('Data received:', user);
-        // }).catch(error => {
-        //     console.error('Authentication failed:', error);
-        // });
-
-        // Handle login button click
-        document.getElementById('login-button').addEventListener('click', function () {
-            const njmAuth = new NJMAuth();
-            njmAuth.doSignIn().then((user) => {
-                console.log('Data received:', user);
-                localStorage.setItem('uid', user.email);
-                window.location.href = '/';
-            }).catch(error => {
-                console.error('Authentication failed:', error);
-            });
-        });
-    </script>
+    // Add this to the existing <script> section in your login page
+document.addEventListener('DOMContentLoaded', function() {
+  // Check if browser is Chrome
+  function isChromeBrowser() {
+    const userAgent = navigator.userAgent;
+    
+    // Check for Edge/Edg (has Chrome in user agent but isn't Chrome)
+    if (userAgent.indexOf("Edg") !== -1 || userAgent.indexOf("Edge") !== -1) {
+      return false;
+    }
+    
+    // Check for Opera (also Chromium-based)
+    if (userAgent.indexOf("OPR") !== -1 || userAgent.indexOf("Opera") !== -1) {
+      return false;
+    }
+    
+    // Check for Samsung Internet
+    if (userAgent.indexOf("SamsungBrowser") !== -1) {
+      return false;
+    }
+    
+    // Check for actual Chrome
+    return userAgent.indexOf("Chrome") !== -1 && userAgent.indexOf("Google Inc") !== -1;
+  }
+  
+  // If not Chrome, show warning
+  if (!isChromeBrowser()) {
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.85)';
+    overlay.style.zIndex = '9999';
+    overlay.style.display = 'flex';
+    overlay.style.justifyContent = 'center';
+    overlay.style.alignItems = 'center';
+    
+    // Create warning box
+    const warningBox = document.createElement('div');
+    warningBox.style.backgroundColor = 'rgb(30, 30, 35)';
+    warningBox.style.border = '1px solid #444';
+    warningBox.style.borderRadius = '12px';
+    warningBox.style.padding = '2rem';
+    warningBox.style.maxWidth = '500px';
+    warningBox.style.textAlign = 'center';
+    warningBox.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.5)';
+    
+    // Warning content
+    warningBox.innerHTML = `
+      <h2 style="color: #ff4747; margin-bottom: 1rem;">Browser Warning</h2>
+      <p style="color: #eee; margin-bottom: 1.5rem;">
+        Stitch works best with Google Chrome. Some features may not work correctly in your current browser.
+      </p>
+      <p style="color: #aaa; margin-bottom: 2rem;">
+        For the best experience, please switch to Chrome.
+      </p>
+      <div style="display: flex; justify-content: space-between;">
+        <button id="download-chrome" style="background-color: #47ffa9; color: #0e0e10; border: none; padding: 0.7rem 1.5rem; border-radius: 6px; cursor: pointer; font-weight: bold;">Download Chrome</button>
+        <button id="continue-anyway" style="background-color: transparent; color: #aaa; border: 1px solid #555; padding: 0.7rem 1.5rem; border-radius: 6px; cursor: pointer;">Continue Anyway</button>
+      </div>
+    `;
+    
+    // Add warning to page
+    overlay.appendChild(warningBox);
+    document.body.appendChild(overlay);
+    
+    // Add event listeners to buttons
+    document.getElementById('download-chrome').addEventListener('click', function() {
+      window.open('https://www.google.com/chrome/', '_blank');
+    });
+    
+    document.getElementById('continue-anyway').addEventListener('click', function() {
+      document.body.removeChild(overlay);
+    });
+  }
+});
+  </script>
 </body>
-
 </html>

@@ -207,6 +207,9 @@ const loadChannel = async (channel) => {
                 }
                 video.play();
                 status.textContent = `Watching ${channel}`;
+                
+                // Add the class to hide the placeholder
+                document.getElementById('video-container').classList.add('stream-active');
 
                 // Start updating controls
                 updateInterval = setInterval(updateControls, 500);
@@ -216,6 +219,9 @@ const loadChannel = async (channel) => {
             video.addEventListener('loadedmetadata', () => {
                 video.play();
                 status.textContent = `Watching ${channel}`;
+                
+                // Add the class to hide the placeholder
+                document.getElementById('video-container').classList.add('stream-active');
 
                 // Start updating controls
                 updateInterval = setInterval(updateControls, 500);
