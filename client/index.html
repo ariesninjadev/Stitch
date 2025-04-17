@@ -4,127 +4,49 @@
   <meta charset="UTF-8">
   <title>Stitch</title>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-  <style>
-    body {
-      background-color: #0e0e10;
-      color: #eee;
-      font-family: sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 2rem;
-    }
-    input, button {
-      padding: 0.5rem 1rem;
-      font-size: 1rem;
-      border-radius: 6px;
-      margin: 0.5rem;
-      border: none;
-    }
-    input {
-      width: 200px;
-    }
-    #video {
-      margin-top: 2rem;
-      width: 100%;
-      max-width: 900px;
-      border: 2px solid #444;
-      border-radius: 12px;
-    }
-    .status {
-      margin-top: 1rem;
-      font-size: 0.9rem;
-      color: #aaa;
-    }
-  </style>
+    <link rel="stylesheet" href="./resources/css/main.css"/>
 </head>
 <body>
+  <!-- Auth Loading Screen -->
+  <div id="auth-loading">
+    <div class="spinner"></div>
+    <div class="auth-message">Authenticating...</div>
+    <a href="/login" class="login-link" id="login-link">Go to Login</a>
+  </div>
 
-  <h1>Stitch</h1>
+  <div id="main-content">
+    <h1>Stitch</h1>
 
-  <form id="form">
-    <input type="text" id="channelInput" placeholder="Enter channel name" />
-    <button type="submit">Watch</button>
-  </form>
+    <form id="form">
+      <input type="text" id="channelInput" placeholder="Enter channel name" />
+      <button type="submit">Watch</button>
+    </form>
 
-  <div class="status" id="status">Idle...</div>
+    <div class="status" id="status">Idle...</div>
 
-  <video id="video" controls autoplay muted></video>
+    <div id="video-container">
+      <video id="video" autoplay muted></video>
+      <div class="custom-controls">
+        <div class="seekbar-container" id="seekbar">
+          <div class="seekbar-progress" id="seekbar-progress">
+            <div class="seekbar-handle"></div>
+          </div>
+        </div>
+        <div class="controls-row">
+          <div class="left-controls">
+            <button class="control-button" id="playPauseBtn">Play</button>
+            <button class="control-button" id="muteBtn">Unmute</button>
+            <span class="time-display" id="timeDisplay">Loading...</span>
+          </div>
+          <div class="right-controls">
+            <div class="live-indicator" id="liveIndicator">LIVE</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-  <script>
-    const form = document.getElementById('form');
-    const input = document.getElementById('channelInput');
-    const status = document.getElementById('status');
-    const video = document.getElementById('video');
-
-    const getQueryParam = (key) => {
-      const params = new URLSearchParams(window.location.search);
-      return params.get(key);
-    };
-
-    const loadChannel = async (channel) => {
-      if (!channel) {
-        status.textContent = 'Please enter a channel name.';
-        return;
-      }
-
-      status.textContent = `Loading stream for ${channel}...`;
-
-      try {
-        const res = await fetch(`https://api.ninjam.us:3001/twitch/${channel}`);
-        const data = await res.json();
-
-        if (!data.proxy) {
-          status.textContent = `Error: ${data.error || 'No stream found'}`;
-          return;
-        }
-
-        // Clear previous source
-        video.pause();
-        video.removeAttribute('src');
-        video.load();
-
-        if (Hls.isSupported()) {
-          const hls = new Hls();
-          hls.loadSource(data.proxy);
-          hls.attachMedia(video);
-          hls.on(Hls.Events.MANIFEST_PARSED, () => {
-            video.play();
-            status.textContent = `Watching ${channel}`;
-          });
-        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-          video.src = data.proxy;
-          video.addEventListener('loadedmetadata', () => {
-            video.play();
-            status.textContent = `Watching ${channel}`;
-          });
-        } else {
-          status.textContent = 'HLS not supported in this browser.';
-        }
-
-      } catch (err) {
-        console.error(err);
-        status.textContent = 'Failed to load stream.';
-      }
-    };
-
-    // On form submit
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const channel = input.value.trim().toLowerCase();
-      if (channel) {
-        window.history.replaceState({}, '', `?channel=${channel}`);
-        loadChannel(channel);
-      }
-    });
-
-    // Auto-load from query param
-    const initialChannel = getQueryParam('channel');
-    if (initialChannel) {
-      input.value = initialChannel;
-      loadChannel(initialChannel);
-    }
-  </script>
+<script src="./resources/js/main.js"></script>
 
 </body>
 </html>

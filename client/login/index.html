@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Stitch - Login</title>
+    <link rel="stylesheet" href="../resources/css/main.css" />
+    <style>
+        .login-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 80vh;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .logo {
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        .logo h1 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            color: #47ffa9;
+        }
+
+        .logo p {
+            color: #aaa;
+            font-size: 1.1rem;
+        }
+
+        .login-card {
+            background-color: rgba(30, 30, 35, 0.7);
+            border: 1px solid #444;
+            border-radius: 12px;
+            padding: 2.5rem;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-title {
+            margin-bottom: 2rem;
+            font-size: 1.5rem;
+            color: #eee;
+        }
+
+        .login-button {
+            background-color: #47ffa9;
+            color: #0e0e10;
+            border: none;
+            padding: 0.8rem 2rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .login-button:hover {
+            background-color: #3ad890;
+            transform: translateY(-2px);
+        }
+
+        .footer-text {
+            margin-top: 2.5rem;
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .footer-text a {
+            color: #47ffa9;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <h1>Stitch</h1>
+            <p>Your personal stream experience</p>
+        </div>
+
+        <div class="login-card">
+            <h2 class="login-title">Sign in to continue</h2>
+
+            <button id="login-button" class="login-button">
+                Login with NJM
+            </button>
+
+            <p class="footer-text">
+                By signing in, you agree to our <a href="/terms">Terms of Service</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+
+        class NJMAuth {
+            constructor() {
+                this.authPlatformURL = 'https://sso.ninjam.us/';
+            }
+
+            doSignIn() {
+                return new Promise((resolve, reject) => {
+                    // Calculate center position based on screen dimensions
+                    const width = 600;
+                    const height = 600;
+                    const left = (screen.width - width) / 2;
+                    const top = (screen.height - height) / 2;
+
+                    // Open popup with centered position
+                    const popup = window.open(
+                        this.authPlatformURL + '/flow',
+                        '_popup',
+                        `width=${width},height=${height},left=${left},top=${top}`
+                    );
+
+                    if (!popup) {
+                        reject(new Error('Failed to open popup window. It may have been blocked.'));
+                        return;
+                    }
+
+                    const messageHandler = (event) => {
+                        if (event.origin !== this.authPlatformURL) return;
+
+                        if (event.data.type === 'AUTH_SUCCESS') {
+                            window.removeEventListener('message', messageHandler);
+                            popup.close();
+                            resolve(event.data.user);
+                        }
+                    };
+
+                    window.addEventListener('message', messageHandler);
+
+                    popup.addEventListener('load', () => {
+                        popup.postMessage(
+                            {
+                                type: 'AUTH_CONTEXT'
+                            },
+                            this.authPlatformURL + '/flow'
+                        );
+                    });
+                });
+            }
+        }
+
+        // const njmAuth = new NJMAuth();
+        // njmAuth.doSignIn().then((user) => {
+        //     console.log('Data received:', user);
+        // }).catch(error => {
+        //     console.error('Authentication failed:', error);
+        // });
+
+        // Handle login button click
+        document.getElementById('login-button').addEventListener('click', function () {
+            const njmAuth = new NJMAuth();
+            njmAuth.doSignIn().then((user) => {
+                console.log('Data received:', user);
+                // Redirect to the main page or perform any other action
+                window.location.href = '/';
+            }).catch(error => {
+                console.error('Authentication failed:', error);
+            });
+        });
+    </script>
+</body>
+
+</html>
