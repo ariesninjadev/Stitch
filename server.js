@@ -7,59 +7,71 @@ const cors = require('cors');
 const app = express();
 const PORT = 3001;
 
-// SSL certs
 const SSL_OPTIONS = {
   key: fs.readFileSync('./certs/privkey.pem'),
   cert: fs.readFileSync('./certs/fullchain.pem'),
 };
 
-// Allow only your frontend
-app.use(cors({
-  origin: 'https://stitch-coy.pages.dev',
-}));
+// Only allow your frontend
+app.use(cors());
 
-// Cache for stream URLs
+// Stream cache: { [channel]: { url, timestamp } }
 const streamCache = new Map();
 
 function sanitizeChannelName(name) {
   return name.trim().toLowerCase();
 }
 
-app.get('/twitch/:channel?', (req, res) => {
-  const raw = req.params.channel || req.query.channel;
-  if (!raw) return res.status(400).json({ error: 'No channel specified' });
+function handleStreamRequest(channel, res) {
+  const clean = sanitizeChannelName(channel);
 
-  const channel = sanitizeChannelName(raw);
-
-  if (!/^[a-z0-9_]+$/.test(channel)) {
+  if (!/^[a-z0-9_]+$/.test(clean)) {
     return res.status(400).json({ error: 'Invalid channel name' });
   }
 
-  const cached = streamCache.get(channel);
+  const cached = streamCache.get(clean);
   if (cached && Date.now() - cached.timestamp < 30_000) {
     return res.json({ proxy: cached.url });
   }
 
-  const cmd = `streamlink https://www.twitch.tv/${channel} best --stream-url`;
+  const cmd = `streamlink https://www.twitch.tv/${clean} best --stream-url`;
+
   exec(cmd, (error, stdout, stderr) => {
     if (error) {
       console.error(`[Streamlink Error] ${stderr}`);
-      return res.status(500).json({ error: stderr || 'Failed to fetch stream URL' });
+      return res.status(500).json({ error: stderr || 'Stream not available' });
     }
 
     const m3u8 = stdout.trim();
     const encoded = Buffer.from(m3u8).toString('base64');
     const proxyUrl = `https://api.ninjam.us:3000/${encoded}.m3u8`;
 
-    streamCache.set(channel, {
+    streamCache.set(clean, {
       url: proxyUrl,
       timestamp: Date.now(),
     });
 
     return res.json({ proxy: proxyUrl });
   });
+}
+
+// Route: /twitch?channel=name
+app.get('/twitch', (req, res) => {
+  const channel = req.query.channel;
+  if (!channel) {
+    return res.status(400).json({ error: 'Missing channel query parameter' });
+  }
+
+  handleStreamRequest(channel, res);
 });
 
+// Route: /twitch/:channel
+app.get('/twitch/:channel', (req, res) => {
+  const { channel } = req.params;
+  handleStreamRequest(channel, res);
+});
+
+// HTTPS server
 https.createServer(SSL_OPTIONS, app).listen(PORT, () => {
   console.log(`Backend HTTPS server running on https://api.ninjam.us:${PORT}`);
 });
