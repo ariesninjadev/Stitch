@@ -95,6 +95,7 @@ input {
     background-color: gray;
 }
 
+
 .custom-controls {
     position: absolute;
     bottom: 0;
@@ -105,11 +106,13 @@ input {
     flex-direction: column;
     padding: 10px;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    pointer-events: none; /* Prevent interaction when hidden */
+    transition: opacity 0.3s ease, pointer-events 0.3s ease;
 }
 
 #video-container:hover .custom-controls {
     opacity: 1;
+    pointer-events: auto;
 }
 
 .seekbar-container {
@@ -279,6 +282,7 @@ input {
     .custom-controls {
         padding: 8px;
         opacity: 1; /* Always visible on mobile */
+        pointer-events: auto;
         transition: none; /* Disable hover-based opacity changes */
     }
 

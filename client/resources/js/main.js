@@ -251,24 +251,49 @@ form.addEventListener('submit', (e) => {
 
 let controlsTimeout;
 
-// Show controls on touch for mobile devices
+// Function to show controls
 const showControls = () => {
-    document.querySelector('.custom-controls').style.opacity = '1';
+    const controls = document.querySelector('.custom-controls');
+    controls.style.opacity = '1';
+    controls.style.pointerEvents = 'auto'; // Ensure controls are interactable
     clearTimeout(controlsTimeout);
-    controlsTimeout = setTimeout(() => {
-        document.querySelector('.custom-controls').style.opacity = '0';
-    }, 3000); // Hide controls after 3 seconds of inactivity
+    controlsTimeout = setTimeout(hideControls, 5000); // Hide after 5 seconds of inactivity
 };
 
-// Add touchstart event listener to the video container
-document.getElementById('video-container').addEventListener('touchstart', () => {
+// Function to hide controls
+const hideControls = () => {
+    const controls = document.querySelector('.custom-controls');
+    controls.style.opacity = '0';
+    controls.style.pointerEvents = 'none'; // Prevent accidental interactions
+};
+
+// Add event listener for touchstart on the video container
+document.getElementById('video-container').addEventListener('touchstart', (e) => {
+    e.stopPropagation(); // Prevent bubbling to avoid conflicts
     showControls();
 });
 
 // Prevent controls from hiding while interacting with them
 document.querySelector('.custom-controls').addEventListener('touchstart', (e) => {
     e.stopPropagation();
-    clearTimeout(controlsTimeout);
+    clearTimeout(controlsTimeout); // Keep controls visible while interacting
+});
+
+// Ensure controls are hidden initially
+hideControls();
+
+// Add a click listener to the document to hide controls when clicking outside the video container
+document.addEventListener('click', (e) => {
+    const videoContainer = document.getElementById('video-container');
+    if (!videoContainer.contains(e.target)) {
+        hideControls();
+    }
+});
+
+// Prevent controls from hiding when clicking inside the video container
+document.getElementById('video-container').addEventListener('click', (e) => {
+    e.stopPropagation();
+    showControls();
 });
 
 const fullscreenBtn = document.getElementById('fullscreenBtn');
