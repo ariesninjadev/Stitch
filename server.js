@@ -3,6 +3,9 @@ const { exec } = require('child_process');
 const fs = require('fs');
 const https = require('https');
 const app = express();
+const cors = require('cors');
+
+app.use(cors());
 
 const SSL_OPTIONS = {
   key: fs.readFileSync('./certs/privkey.pem'),
@@ -23,7 +26,7 @@ app.get('/twitch/:channel', (req, res) => {
 
     const m3u8 = stdout.trim();
     const encoded = Buffer.from(m3u8).toString('base64');
-    const proxyUrl = `https://api.ninjam.us:3000/proxy/${encoded}.m3u8`;
+    const proxyUrl = `https://api.ninjam.us:3000/${encoded}.m3u8`;
 
     return res.json({ proxy: proxyUrl });
   });
