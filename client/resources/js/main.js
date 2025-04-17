@@ -256,46 +256,25 @@ const loadChannel = async (channel) => {
     }
 };
 
-// Function to reset and re-establish controls handling
-const resetControlsHandling = () => {
-    // Clear any existing timeout
-    clearTimeout(controlsTimeout);
-    
-    // Clean up existing event listeners to prevent duplication
-    const videoContainer = document.getElementById('video-container');
-    const controls = document.querySelector('.custom-controls');
-    
-    // Re-initialize controls visibility
-    if (isMobileDevice()) {
-        controls.style.opacity = '0';
-        controls.style.pointerEvents = 'none';
-        
-        // Show controls initially then fade out
-        showControls();
-    }
-};
-
-// Helper function to detect mobile devices
-const isMobileDevice = () => {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
-           (navigator.maxTouchPoints && navigator.maxTouchPoints > 2);
-};
+let controlsTimeout = null;
 
 // Updated showControls function with more reliable behavior
 const showControls = () => {
     const controls = document.querySelector('.custom-controls');
     
+    // Cancel any pending hide operation
+    clearTimeout(controlsTimeout);
+    
     // Force a DOM reflow to ensure the opacity transition works
-    // This helps break any animation loop that might be happening
     void controls.offsetWidth;
     
     controls.style.opacity = '1';
     controls.style.pointerEvents = 'auto';
     
-    clearTimeout(controlsTimeout);
+    // Set timeout to hide controls after delay
     controlsTimeout = setTimeout(() => {
         hideControls();
-    }, 5000);
+    }, 3000); // Changed to 3 seconds as specified
 };
 
 // Updated hideControls with more reliable behavior
@@ -312,29 +291,80 @@ const hideControls = () => {
 // Track if user is interacting with controls
 let isInteractingWithControls = false;
 
-// Add these event listeners after the existing ones
+// Update the video event handlers for better iPad compatibility
+video.addEventListener('click', function(e) {
+    e.stopPropagation();
+    showControls();
+    
+    // Toggle play/pause on mobile devices
+    if (isMobileDevice()) {
+        if (video.paused) {
+            video.play();
+        } else {
+            video.pause();
+        }
+    }
+});
+
+// Improved touchstart handler for iPad
+video.addEventListener('touchstart', function(e) {
+    // Don't prevent default entirely to allow HLS to work properly
+    e.stopPropagation();
+    
+    // Use a slight delay to avoid conflicts with HLS.js touch handlers
+    setTimeout(() => {
+        showControls();
+    }, 10);
+});
+
+// Improve interaction tracking for controls
 document.querySelector('.custom-controls').addEventListener('touchstart', () => {
     isInteractingWithControls = true;
     clearTimeout(controlsTimeout);
-});
+}, { passive: false });
 
 document.querySelector('.custom-controls').addEventListener('touchend', () => {
-    isInteractingWithControls = false;
-    showControls(); // Reset the timer after interaction
-});
+    // Short delay before resetting the interaction flag
+    setTimeout(() => {
+        isInteractingWithControls = false;
+        showControls(); // Reset the timer after interaction
+    }, 100);
+}, { passive: false });
 
-// Update video click/touch handler to prevent conflicts with HLS.js
-video.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    showControls();
-});
+// Improved resetControlsHandling function
+const resetControlsHandling = () => {
+    clearTimeout(controlsTimeout);
+    
+    const controls = document.querySelector('.custom-controls');
+    
+    if (isMobileDevice()) {
+        // Always start with controls visible when stream loads
+        controls.style.transition = 'none'; // Temporarily disable transitions
+        controls.style.opacity = '1';
+        controls.style.pointerEvents = 'auto';
+        
+        // Force reflow and restore transitions
+        void controls.offsetWidth;
+        controls.style.transition = '';
+        
+        // Set timeout to hide controls
+        controlsTimeout = setTimeout(() => {
+            hideControls();
+        }, 3000);
+    }
+};
 
-video.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    showControls();
-});
+// Add specific detection for iPad
+const isIPad = () => {
+    return /iPad|Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1;
+};
+
+// Update mobile detection to include iPad
+const isMobileDevice = () => {
+    return /Android|webOS|iPhone|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+           isIPad() || 
+           (navigator.maxTouchPoints && navigator.maxTouchPoints > 2);
+};
 
 const fullscreenBtn = document.getElementById('fullscreenBtn');
 const videoContainer = document.getElementById('video-container');
