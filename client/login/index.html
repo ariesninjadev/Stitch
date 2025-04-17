@@ -94,7 +94,7 @@
             </button>
 
             <p class="footer-text">
-                By signing in, you agree to our <a href="/terms">Terms of Service</a>
+                By signing in, you agree to our <a href="https://sso.ninjam.us/tos">Terms of Service</a>
             </p>
         </div>
     </div>
@@ -103,20 +103,17 @@
 
         class NJMAuth {
             constructor() {
-                this.authPlatformURL = 'https://sso.ninjam.us/';
+                this.authPlatformURL = 'https://sso.ninjam.us';
             }
 
             doSignIn() {
                 return new Promise((resolve, reject) => {
-                    // Calculate center position based on screen dimensions
                     const width = 600;
                     const height = 600;
                     const left = (screen.width - width) / 2;
                     const top = (screen.height - height) / 2;
-
-                    // Open popup with centered position
                     const popup = window.open(
-                        this.authPlatformURL + '/flow',
+                        this.authPlatformURL + `/flow?origin=${encodeURIComponent(origin)}`,
                         '_popup',
                         `width=${width},height=${height},left=${left},top=${top}`
                     );
@@ -129,6 +126,11 @@
                     const messageHandler = (event) => {
                         if (event.origin !== this.authPlatformURL) return;
 
+                        if (event.data.type === 'READY_FOR_CONTEXT') {
+                            popup.postMessage({ type: 'AUTH_CONTEXT' }, this.authPlatformURL);
+                            return;
+                        }
+
                         if (event.data.type === 'AUTH_SUCCESS') {
                             window.removeEventListener('message', messageHandler);
                             popup.close();
@@ -138,14 +140,6 @@
 
                     window.addEventListener('message', messageHandler);
 
-                    popup.addEventListener('load', () => {
-                        popup.postMessage(
-                            {
-                                type: 'AUTH_CONTEXT'
-                            },
-                            this.authPlatformURL + '/flow'
-                        );
-                    });
                 });
             }
         }
@@ -162,7 +156,7 @@
             const njmAuth = new NJMAuth();
             njmAuth.doSignIn().then((user) => {
                 console.log('Data received:', user);
-                // Redirect to the main page or perform any other action
+                localStorage.setItem('uid', user.email);
                 window.location.href = '/';
             }).catch(error => {
                 console.error('Authentication failed:', error);

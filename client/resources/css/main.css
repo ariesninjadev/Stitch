@@ -189,8 +189,15 @@ input {
 }
 
 .auth-message {
-    font-size: 1.2rem;
+    font-size: 1.6rem;
     color: #eee;
+}
+
+.auth-description {
+    font-size: 1rem;
+    color: #aaa;
+    margin-top: 10px;
+    text-align: center;
 }
 
 .login-link {

@@ -71,6 +71,32 @@ app.get('/twitch/:channel', (req, res) => {
   handleStreamRequest(channel, res);
 });
 
+// Route: /auth/:urlencodedemail
+app.get('/auth/:urlencodedemail', (req, res) => {
+  const { urlencodedemail } = req.params;
+  const email = decodeURIComponent(urlencodedemail);
+
+  if (!email || !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
+    return res.status(400).json({ error: 'Invalid email address' });
+  }
+
+  // Find the email in beta.txt (line-seperated emails)
+  fs.readFile('./beta.txt', 'utf8', (err, data) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+
+    const emails = data.split('\n').map(line => line.trim());
+    if (emails.includes(email)) {
+      return res.json({ authenticated: true });
+    } else {
+      return res.json({ authenticated: false });
+    }
+  });
+});
+
+
 // HTTPS server
 https.createServer(SSL_OPTIONS, app).listen(PORT, () => {
   console.log(`Backend HTTPS server running on https://api.ninjam.us:${PORT}`);
