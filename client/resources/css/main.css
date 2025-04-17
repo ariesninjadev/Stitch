@@ -310,3 +310,85 @@ input {
         height: 20px;
     }
 }
+
+.stream-directory {
+    margin-top: 2rem;
+    width: 100%;
+    max-width: 900px;
+}
+
+.stream-directory h2 {
+    margin-bottom: 1rem;
+    text-align: center;
+    color: #47ffa9;
+}
+
+.stream-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+}
+
+.stream-card {
+    background-color: #1a1a1c;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid #333;
+}
+
+.stream-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(71, 255, 169, 0.2);
+    border-color: #47ffa9;
+}
+
+.stream-thumbnail {
+    height: 100px;
+    background-color: #0e0e10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #47ffa9;
+}
+
+.stream-thumbnail i {
+    font-size: 2.5rem;
+}
+
+.stream-info {
+    padding: 0.8rem;
+}
+
+.stream-title {
+    font-weight: bold;
+    margin-bottom: 0.3rem;
+}
+
+.stream-channel {
+    font-size: 0.8rem;
+    color: #aaa;
+}
+
+.stream-card.active {
+    border-color: #47ffa9;
+    box-shadow: 0 0 10px rgba(71, 255, 169, 0.4);
+}
+
+/* Mobile responsive adjustments for stream directory */
+@media (max-width: 768px) {
+    .stream-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .stream-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stream-thumbnail {
+        height: 80px;
+    }
+}

@@ -257,6 +257,20 @@ const loadChannel = async (channel) => {
 };
 
 let controlsTimeout = null;
+let inactivityTimeout = null;
+
+const resetInactivityTimer = () => {
+    // Clear any existing inactivity timer
+    clearTimeout(inactivityTimeout);
+    
+    // Show controls when there's activity
+    showControls();
+    
+    // Set new inactivity timer - hide controls after 5 seconds of inactivity
+    inactivityTimeout = setTimeout(() => {
+        hideControls();
+    }, 5000); // 5 seconds inactivity timeout
+};
 
 // Updated showControls function with more reliable behavior
 const showControls = () => {
@@ -270,11 +284,6 @@ const showControls = () => {
     
     controls.style.opacity = '1';
     controls.style.pointerEvents = 'auto';
-    
-    // Set timeout to hide controls after delay
-    controlsTimeout = setTimeout(() => {
-        hideControls();
-    }, 3000); // Changed to 3 seconds as specified
 };
 
 // Updated hideControls with more reliable behavior
@@ -291,10 +300,10 @@ const hideControls = () => {
 // Track if user is interacting with controls
 let isInteractingWithControls = false;
 
-// Update the video event handlers for better iPad compatibility
+// Update video click handler
 video.addEventListener('click', function(e) {
     e.stopPropagation();
-    showControls();
+    resetInactivityTimer();
     
     // Toggle play/pause on mobile devices
     if (isMobileDevice()) {
@@ -306,14 +315,13 @@ video.addEventListener('click', function(e) {
     }
 });
 
-// Improved touchstart handler for iPad
+// Update video touch handler
 video.addEventListener('touchstart', function(e) {
-    // Don't prevent default entirely to allow HLS to work properly
     e.stopPropagation();
     
     // Use a slight delay to avoid conflicts with HLS.js touch handlers
     setTimeout(() => {
-        showControls();
+        resetInactivityTimer();
     }, 10);
 });
 
@@ -321,19 +329,24 @@ video.addEventListener('touchstart', function(e) {
 document.querySelector('.custom-controls').addEventListener('touchstart', () => {
     isInteractingWithControls = true;
     clearTimeout(controlsTimeout);
+    clearTimeout(inactivityTimeout); // Also clear inactivity timeout
 }, { passive: false });
 
 document.querySelector('.custom-controls').addEventListener('touchend', () => {
     // Short delay before resetting the interaction flag
     setTimeout(() => {
         isInteractingWithControls = false;
-        showControls(); // Reset the timer after interaction
+        resetInactivityTimer(); // Reset inactivity timer after interaction
     }, 100);
 }, { passive: false });
+
+// Initialize controls state when the player is ready
+video.addEventListener('loadedmetadata', resetInactivityTimer);
 
 // Improved resetControlsHandling function
 const resetControlsHandling = () => {
     clearTimeout(controlsTimeout);
+    clearTimeout(inactivityTimeout);
     
     const controls = document.querySelector('.custom-controls');
     
@@ -348,11 +361,13 @@ const resetControlsHandling = () => {
         controls.style.transition = '';
         
         // Set timeout to hide controls
-        controlsTimeout = setTimeout(() => {
-            hideControls();
-        }, 3000);
+        resetInactivityTimer();
     }
 };
+
+document.addEventListener('mousemove', resetInactivityTimer);
+document.addEventListener('touchstart', resetInactivityTimer);
+document.addEventListener('click', resetInactivityTimer);
 
 // Add specific detection for iPad
 const isIPad = () => {
