@@ -111,13 +111,17 @@ const updateControls = () => {
     // Update time display
     const currentTime = formatTime(video.currentTime);
     const duration = isLive ? "LIVE" : formatTime(video.duration);
-    timeDisplay.textContent = isLive ? `${watchingFor(video.duration)}` : `${currentTime} / ${formatTime(video.duration)}`;
+    timeDisplay.textContent = isLive ? `${watchingFor(video.duration)}` : `${currentTime} / ${formatTime(hls.liveSyncPosition)}`;
 
-    // Update play/pause button
-    playPauseBtn.textContent = video.paused ? "Play" : "Pause";
+    // Update play/pause button icon
+    playPauseBtn.innerHTML = video.paused 
+        ? '<i class="fa-solid fa-play"></i>' 
+        : '<i class="fa-solid fa-pause"></i>';
 
-    // Update mute button
-    muteBtn.textContent = video.muted ? "Unmute" : "Mute";
+    // Update mute button icon
+    muteBtn.innerHTML = video.muted 
+        ? '<i class="fa-solid fa-volume-xmark"></i>' 
+        : '<i class="fa-solid fa-volume-high"></i>';
 };
 
 // Seekbar event listeners
@@ -158,7 +162,7 @@ playPauseBtn.addEventListener('click', () => {
 
 muteBtn.addEventListener('click', () => {
     video.muted = !video.muted;
-    muteBtn.textContent = video.muted ? "Unmute" : "Mute";
+    updateControls(); // Update the icon immediately
 });
 
 liveIndicator.addEventListener('click', () => {
@@ -174,7 +178,7 @@ const loadChannel = async (channel) => {
         return;
     }
 
-    status.textContent = `Loading stream for ${channel}...`;
+    status.textContent = `Loading stream for ${channel}`;
 
     try {
         const res = await fetch(`https://api.ninjam.us:3001/twitch/${channel}`);

@@ -45,7 +45,7 @@ input {
 
 /* Add a placeholder message when no content is loaded */
 #video-container::before {
-    content: "Enter a channel name to start watching";
+    content: "Enter a Twitch channel to start watching";
     color: #555;
     font-size: 1.2rem;
     position: absolute;
@@ -158,6 +158,8 @@ input {
     gap: 15px;
 }
 
+/* ...existing CSS... */
+
 .control-button {
     background: transparent;
     border: none;
@@ -165,7 +167,24 @@ input {
     cursor: pointer;
     padding: 5px;
     font-size: 14px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
 }
+
+.control-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.control-button i {
+    font-size: 16px;
+}
+
+/* ...existing CSS... */
 
 .time-display {
     color: white;

@@ -39,7 +39,7 @@ function handleStreamRequest(channel, res) {
     return res.json({ proxy: cached.url });
   }
 
-  const cmd = `streamlink https://www.twitch.tv/${clean} best --stream-url`;
+  const cmd = `streamlink https://www.twitch.tv/${clean} best --stream-url --twitch-disable-ads `;
 
   exec(cmd, (error, stdout, stderr) => {
     if (error) {
