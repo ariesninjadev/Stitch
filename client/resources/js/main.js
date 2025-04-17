@@ -172,6 +172,16 @@ liveIndicator.addEventListener('click', () => {
     }
 });
 
+form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const channel = input.value.trim().toLowerCase();
+    if (channel) {
+        window.history.replaceState({}, '', `?channel=${channel}`);
+        loadChannel(channel);
+    }
+});
+
+// Modified loadChannel function to properly handle controls
 const loadChannel = async (channel) => {
     if (!channel) {
         status.textContent = 'Please enter a channel name.';
@@ -217,6 +227,9 @@ const loadChannel = async (channel) => {
 
                 // Start updating controls
                 updateInterval = setInterval(updateControls, 500);
+                
+                // Reset controls visibility handling when stream loads
+                resetControlsHandling();
             });
         } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
             video.src = data.proxy;
@@ -229,6 +242,9 @@ const loadChannel = async (channel) => {
 
                 // Start updating controls
                 updateInterval = setInterval(updateControls, 500);
+                
+                // Reset controls visibility handling when stream loads
+                resetControlsHandling();
             });
         } else {
             status.textContent = 'HLS not supported in this browser.';
@@ -240,58 +256,82 @@ const loadChannel = async (channel) => {
     }
 };
 
-form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const channel = input.value.trim().toLowerCase();
-    if (channel) {
-        window.history.replaceState({}, '', `?channel=${channel}`);
-        loadChannel(channel);
+// Function to reset and re-establish controls handling
+const resetControlsHandling = () => {
+    // Clear any existing timeout
+    clearTimeout(controlsTimeout);
+    
+    // Clean up existing event listeners to prevent duplication
+    const videoContainer = document.getElementById('video-container');
+    const controls = document.querySelector('.custom-controls');
+    
+    // Re-initialize controls visibility
+    if (isMobileDevice()) {
+        controls.style.opacity = '0';
+        controls.style.pointerEvents = 'none';
+        
+        // Show controls initially then fade out
+        showControls();
     }
-});
+};
 
-let controlsTimeout;
+// Helper function to detect mobile devices
+const isMobileDevice = () => {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+           (navigator.maxTouchPoints && navigator.maxTouchPoints > 2);
+};
 
-// Function to show controls
+// Updated showControls function with more reliable behavior
 const showControls = () => {
     const controls = document.querySelector('.custom-controls');
+    
+    // Force a DOM reflow to ensure the opacity transition works
+    // This helps break any animation loop that might be happening
+    void controls.offsetWidth;
+    
     controls.style.opacity = '1';
-    controls.style.pointerEvents = 'auto'; // Ensure controls are interactable
+    controls.style.pointerEvents = 'auto';
+    
     clearTimeout(controlsTimeout);
-    controlsTimeout = setTimeout(hideControls, 5000); // Hide after 5 seconds of inactivity
+    controlsTimeout = setTimeout(() => {
+        hideControls();
+    }, 5000);
 };
 
-// Function to hide controls
+// Updated hideControls with more reliable behavior
 const hideControls = () => {
     const controls = document.querySelector('.custom-controls');
-    controls.style.opacity = '0';
-    controls.style.pointerEvents = 'none'; // Prevent accidental interactions
+    
+    // Only hide if not currently interacting with controls
+    if (!isInteractingWithControls) {
+        controls.style.opacity = '0';
+        controls.style.pointerEvents = 'none';
+    }
 };
 
-// Add event listener for touchstart on the video container
-document.getElementById('video-container').addEventListener('touchstart', (e) => {
-    e.stopPropagation(); // Prevent bubbling to avoid conflicts
+// Track if user is interacting with controls
+let isInteractingWithControls = false;
+
+// Add these event listeners after the existing ones
+document.querySelector('.custom-controls').addEventListener('touchstart', () => {
+    isInteractingWithControls = true;
+    clearTimeout(controlsTimeout);
+});
+
+document.querySelector('.custom-controls').addEventListener('touchend', () => {
+    isInteractingWithControls = false;
+    showControls(); // Reset the timer after interaction
+});
+
+// Update video click/touch handler to prevent conflicts with HLS.js
+video.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     showControls();
 });
 
-// Prevent controls from hiding while interacting with them
-document.querySelector('.custom-controls').addEventListener('touchstart', (e) => {
-    e.stopPropagation();
-    clearTimeout(controlsTimeout); // Keep controls visible while interacting
-});
-
-// Ensure controls are hidden initially
-hideControls();
-
-// Add a click listener to the document to hide controls when clicking outside the video container
-document.addEventListener('click', (e) => {
-    const videoContainer = document.getElementById('video-container');
-    if (!videoContainer.contains(e.target)) {
-        hideControls();
-    }
-});
-
-// Prevent controls from hiding when clicking inside the video container
-document.getElementById('video-container').addEventListener('click', (e) => {
+video.addEventListener('touchstart', (e) => {
+    e.preventDefault();
     e.stopPropagation();
     showControls();
 });
