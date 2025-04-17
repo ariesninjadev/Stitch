@@ -267,3 +267,42 @@ input {
     display: none;
     text-align: center;
 }
+
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+    #video-container {
+        max-width: 100%;
+        border: none;
+        border-radius: 0;
+    }
+
+    .custom-controls {
+        padding: 8px;
+        opacity: 1; /* Always visible on mobile */
+        transition: none; /* Disable hover-based opacity changes */
+    }
+
+    .control-button {
+        font-size: 18px;
+        width: 40px;
+        height: 40px;
+    }
+
+    .time-display {
+        font-size: 16px;
+    }
+
+    .live-indicator {
+        font-size: 14px;
+        padding: 5px 8px;
+    }
+
+    .seekbar-container {
+        height: 12px;
+    }
+
+    .seekbar-handle {
+        width: 20px;
+        height: 20px;
+    }
+}

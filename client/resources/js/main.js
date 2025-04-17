@@ -248,3 +248,51 @@ form.addEventListener('submit', (e) => {
         loadChannel(channel);
     }
 });
+
+let controlsTimeout;
+
+// Show controls on touch for mobile devices
+const showControls = () => {
+    document.querySelector('.custom-controls').style.opacity = '1';
+    clearTimeout(controlsTimeout);
+    controlsTimeout = setTimeout(() => {
+        document.querySelector('.custom-controls').style.opacity = '0';
+    }, 3000); // Hide controls after 3 seconds of inactivity
+};
+
+// Add touchstart event listener to the video container
+document.getElementById('video-container').addEventListener('touchstart', () => {
+    showControls();
+});
+
+// Prevent controls from hiding while interacting with them
+document.querySelector('.custom-controls').addEventListener('touchstart', (e) => {
+    e.stopPropagation();
+    clearTimeout(controlsTimeout);
+});
+
+const fullscreenBtn = document.getElementById('fullscreenBtn');
+const videoContainer = document.getElementById('video-container');
+
+// Toggle fullscreen mode
+const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+        videoContainer.requestFullscreen().catch((err) => {
+            console.error(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+    } else {
+        document.exitFullscreen();
+    }
+};
+
+// Update fullscreen button icon
+const updateFullscreenIcon = () => {
+    const isFullscreen = !!document.fullscreenElement;
+    fullscreenBtn.innerHTML = isFullscreen
+        ? '<i class="fa-solid fa-compress"></i>'
+        : '<i class="fa-solid fa-expand"></i>';
+};
+
+// Add event listeners
+fullscreenBtn.addEventListener('click', toggleFullscreen);
+document.addEventListener('fullscreenchange', updateFullscreenIcon);
