@@ -95,7 +95,6 @@ input {
     background-color: gray;
 }
 
-
 .custom-controls {
     position: absolute;
     bottom: 0;
@@ -103,10 +102,10 @@ input {
     right: 0;
     background: rgba(0, 0, 0, 0.7);
     display: flex;
-    flex-direction: column;
-    padding: 10px;
+    /* Remove flex-direction: column since we no longer have stacked elements */
+    padding: 10px 15px; /* Add more horizontal padding for better appearance */
     opacity: 0;
-    pointer-events: none; /* Prevent interaction when hidden */
+    pointer-events: none;
     transition: opacity 0.3s ease, pointer-events 0.3s ease;
 }
 
@@ -148,10 +147,12 @@ input {
     transform: scale(1);
 }
 
+
 .controls-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    width: 100%; /* Ensure it takes full width */
 }
 
 .left-controls,

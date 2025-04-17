@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Stitch v1.2.4</title>
+  <title>Stitch v1.2.5</title>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="./resources/css/main.css"/>
@@ -29,12 +29,9 @@
 
     <div id="video-container">
       <video id="video" autoplay muted></video>
+      <!-- ...existing code... -->
       <div class="custom-controls">
-        <div class="seekbar-container" id="seekbar">
-          <div class="seekbar-progress" id="seekbar-progress">
-            <div class="seekbar-handle"></div>
-          </div>
-        </div>
+        <!-- Remove the seekbar container entirely -->
         <div class="controls-row">
           <div class="left-controls">
             <button class="control-button" id="playPauseBtn"><i class="fa-solid fa-play"></i></button>

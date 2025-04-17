@@ -27,36 +27,40 @@ function sanitizeChannelName(name) {
   return name.trim().toLowerCase();
 }
 
+// Update the handleStreamRequest function to specify a lower quality option
+
 function handleStreamRequest(channel, res) {
   const clean = sanitizeChannelName(channel);
 
   if (!/^[a-z0-9_]+$/.test(clean)) {
-    return res.status(400).json({ error: 'Invalid channel name' });
+      return res.status(400).json({ error: 'Invalid channel name' });
   }
 
   const cached = streamCache.get(clean);
   if (cached && Date.now() - cached.timestamp < 30_000) {
-    return res.json({ proxy: cached.url });
+      return res.json({ proxy: cached.url });
   }
 
-  const cmd = `streamlink https://www.twitch.tv/${clean} best --stream-url --twitch-disable-ads `;
+  // Modified to prefer 720p60 or 720p streams which require less bandwidth
+  // The order is: try 720p60 first, then 720p, then best available
+  const cmd = `streamlink https://www.twitch.tv/${clean} 720p60,720p,best --stream-url --twitch-disable-ads --hls-segment-threads 2 --hls-segment-timeout 10 --hls-timeout 60`;
 
   exec(cmd, (error, stdout, stderr) => {
-    if (error) {
-      console.error(`[Streamlink Error] ${stderr}`);
-      return res.status(500).json({ error: stderr || 'Stream not available' });
-    }
+      if (error) {
+          console.error(`[Streamlink Error] ${stderr}`);
+          return res.status(500).json({ error: stderr || 'Stream not available' });
+      }
 
-    const m3u8 = stdout.trim();
-    const encoded = Buffer.from(m3u8).toString('base64');
-    const proxyUrl = `https://api.ninjam.us:3000/${encoded}.m3u8`;
+      const m3u8 = stdout.trim();
+      const encoded = Buffer.from(m3u8).toString('base64');
+      const proxyUrl = `https://api.ninjam.us:3000/${encoded}.m3u8`;
 
-    streamCache.set(clean, {
-      url: proxyUrl,
-      timestamp: Date.now(),
-    });
+      streamCache.set(clean, {
+          url: proxyUrl,
+          timestamp: Date.now(),
+      });
 
-    return res.json({ proxy: proxyUrl });
+      return res.json({ proxy: proxyUrl });
   });
 }
 

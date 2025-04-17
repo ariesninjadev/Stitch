@@ -52,14 +52,11 @@ const input = document.getElementById('channelInput');
 const status = document.getElementById('status');
 const video = document.getElementById('video');
 const liveIndicator = document.getElementById('liveIndicator');
-const seekbar = document.getElementById('seekbar');
-const seekbarProgress = document.getElementById('seekbar-progress');
 const playPauseBtn = document.getElementById('playPauseBtn');
 const muteBtn = document.getElementById('muteBtn');
 const timeDisplay = document.getElementById('timeDisplay');
 
 let hls = null;
-let isDraggingSeekbar = false;
 let updateInterval;
 
 const getQueryParam = (key) => {
@@ -82,36 +79,29 @@ const formatTime = (seconds) => {
 
 function watchingFor() {
     if (hls && hls.liveSyncPosition) {
-        return `Watching for ${formatTime(hls.liveSyncPosition)}`;
+        // Check if video is paused
+        if (video.paused) {
+            return `Paused`;
+        } else {
+            return `Watching for ${formatTime(hls.liveSyncPosition)}`;
+        }
     } else {
         return 'LIVE';
     }
 }
 
+let isLiveIndicatorActive = true;
+
 // Update seekbar and controls
 const updateControls = () => {
     if (!hls || isNaN(video.duration)) return;
 
-    const isLive = isAtLiveEdge();
-    liveIndicator.classList.toggle('inactive', !isLive);
-
-    // If at live edge, make seekbar look like it's at the end
-    let progressPercentage;
-    if (isLive) {
-        progressPercentage = 100;
-    } else {
-        const bufferedEnd = video.buffered.length ? video.buffered.end(video.buffered.length - 1) : 0;
-        progressPercentage = (video.currentTime / bufferedEnd) * 100;
-    }
-
-    if (!isDraggingSeekbar) {
-        seekbarProgress.style.width = `${progressPercentage}%`;
-    }
+    // Consider stream as not "live" if it's paused
+    const isLive = !video.paused;
+    liveIndicator.classList.toggle('inactive', !isLiveIndicatorActive);
 
     // Update time display
-    const currentTime = formatTime(video.currentTime);
-    const duration = isLive ? "LIVE" : formatTime(video.duration);
-    timeDisplay.textContent = isLive ? `${watchingFor(video.duration)}` : `${currentTime} / ${formatTime(hls.liveSyncPosition)}`;
+    timeDisplay.textContent = `${watchingFor(video.currentTime)}`;
 
     // Update play/pause button icon
     playPauseBtn.innerHTML = video.paused 
@@ -124,38 +114,12 @@ const updateControls = () => {
         : '<i class="fa-solid fa-volume-high"></i>';
 };
 
-// Seekbar event listeners
-seekbar.addEventListener('mousedown', (e) => {
-    isDraggingSeekbar = true;
-    updateSeekPosition(e);
-});
-
-document.addEventListener('mousemove', (e) => {
-    if (isDraggingSeekbar) {
-        updateSeekPosition(e);
-    }
-});
-
-document.addEventListener('mouseup', () => {
-    isDraggingSeekbar = false;
-});
-
-const updateSeekPosition = (e) => {
-    if (!video.buffered.length) return;
-
-    const rect = seekbar.getBoundingClientRect();
-    const pos = (e.clientX - rect.left) / rect.width;
-    const bufferedEnd = video.buffered.end(video.buffered.length - 1);
-
-    video.currentTime = Math.min(Math.max(0, pos * bufferedEnd), bufferedEnd);
-    seekbarProgress.style.width = `${pos * 100}%`;
-};
-
 // Control button event listeners
 playPauseBtn.addEventListener('click', () => {
     if (video.paused) {
         video.play();
     } else {
+        isLiveIndicatorActive = false;
         video.pause();
     }
 });
@@ -168,6 +132,7 @@ muteBtn.addEventListener('click', () => {
 liveIndicator.addEventListener('click', () => {
     if (hls && hls.liveSyncPosition) {
         video.currentTime = hls.liveSyncPosition;
+        isLiveIndicatorActive = true;
         video.play();
     }
 });
@@ -210,9 +175,76 @@ const loadChannel = async (channel) => {
         clearInterval(updateInterval);
 
         if (Hls.isSupported()) {
-            hls = new Hls();
+            hls = new Hls({
+                // Buffer configuration
+                maxBufferLength: 90,               // Increase buffer length to 90 seconds
+                maxMaxBufferLength: 120,           // Maximum buffer length can grow to 120 seconds
+                maxBufferSize: 60 * 1000 * 1000,   // Increase max buffer size to 60MB
+                maxBufferHole: 1,                  // More tolerant of buffer holes (1 second)
+                
+                // Live stream settings
+                liveSyncDuration: 10,              // Target being 10 seconds behind live edge
+                liveMaxLatencyDuration: 60,        // Accept up to 60 seconds behind live
+                liveDurationInfinity: true,        // Treat live streams as infinite duration
+                
+                // Bandwidth estimation and ABR settings
+                abrEwmaDefaultEstimate: 1000000,   // Default bandwidth estimate (1 Mbps)
+                abrEwmaFastLive: 3.0,              // Faster ABR reactions for live content
+                abrBandWidthFactor: 0.8,           // More conservative bandwidth usage (80%)
+                abrBandWidthUpFactor: 0.7,         // Slower bitrate switching up
+                
+                // Stability settings
+                fragLoadingTimeOut: 20000,         // Longer timeout for segment loading (20s)
+                manifestLoadingTimeOut: 15000,     // Longer timeout for manifest loading (15s)
+                fragLoadingMaxRetry: 6,            // More retries for failed segments
+                
+                // Recovery behavior
+                startLevel: -1,                    // Auto select starting quality level
+                startFragPrefetch: true,           // Prefetch initial fragments
+                lowLatencyMode: false,             // Disable low latency mode to favor stability
+                
+                // Reduce CPU usage
+                stretchShortVideoTrack: true,      // Handle short segments better
+                forceKeyFrameOnDiscontinuity: true // Force keyframes on discontinuities
+            });
+
             hls.loadSource(data.proxy);
             hls.attachMedia(video);
+
+            hls.on(Hls.Events.BUFFER_APPENDED, () => {
+                if (video.buffered.length > 0) {
+                    const bufferStart = video.buffered.start(0);
+                    const bufferEnd = video.buffered.end(video.buffered.length - 1);
+                    const currentTime = video.currentTime;
+                    
+                    // If buffer grows beyond 2 minutes, trim it
+                    if (bufferEnd - bufferStart > 150 && currentTime > bufferStart + 60) {
+                        console.log('Trimming excessive buffer by seeking');
+                        // Keep a full minute of backward buffer
+                        video.currentTime = Math.max(currentTime, bufferStart + 30);
+                    }
+                }
+            });
+
+            // Add error recovery handling
+            hls.on(Hls.Events.ERROR, function (event, data) {
+                if (data.fatal) {
+                    switch (data.type) {
+                        case Hls.ErrorTypes.NETWORK_ERROR:
+                            console.log('Fatal network error encountered, trying to recover...');
+                            hls.startLoad();
+                            break;
+                        case Hls.ErrorTypes.MEDIA_ERROR:
+                            console.log('Fatal media error encountered, trying to recover...');
+                            hls.recoverMediaError();
+                            break;
+                        default:
+                            console.log('Fatal error, cannot recover:', data);
+                            hls.destroy();
+                            break;
+                    }
+                }
+            });
 
             hls.on(Hls.Events.MANIFEST_PARSED, () => {
                 const seekTo = hls.liveSyncPosition || video.duration;
@@ -220,6 +252,7 @@ const loadChannel = async (channel) => {
                     video.currentTime = seekTo;
                 }
                 video.play();
+                isLiveIndicatorActive = true;
                 status.textContent = `Watching ${channel}`;
                 
                 // Add the class to hide the placeholder
@@ -235,6 +268,7 @@ const loadChannel = async (channel) => {
             video.src = data.proxy;
             video.addEventListener('loadedmetadata', () => {
                 video.play();
+                isLiveIndicatorActive = true;
                 status.textContent = `Watching ${channel}`;
                 
                 // Add the class to hide the placeholder
@@ -406,3 +440,46 @@ const updateFullscreenIcon = () => {
 // Add event listeners
 fullscreenBtn.addEventListener('click', toggleFullscreen);
 document.addEventListener('fullscreenchange', updateFullscreenIcon);
+
+// ...existing code...
+
+// After the fullscreenBtn event listeners at the end, add the stream directory functionality:
+
+// Stream directory functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const streamCards = document.querySelectorAll('.stream-card');
+    
+    streamCards.forEach(card => {
+        card.addEventListener('click', function() {
+            const channel = this.getAttribute('data-channel');
+            if (channel) {
+                // Update input field with the selected channel
+                input.value = channel;
+                
+                // Load the selected channel
+                loadChannel(channel);
+                
+                // Update URL parameter
+                window.history.replaceState({}, '', `?channel=${channel}`);
+                
+                // Remove active class from all cards
+                streamCards.forEach(c => c.classList.remove('active'));
+                
+                // Add active class to the clicked card
+                this.classList.add('active');
+            }
+        });
+    });
+    
+    // Mark active card based on current channel
+    const currentChannel = getQueryParam('channel');
+    if (currentChannel) {
+        const activeCard = Array.from(streamCards).find(
+            card => card.getAttribute('data-channel') === currentChannel
+        );
+        
+        if (activeCard) {
+            activeCard.classList.add('active');
+        }
+    }
+});
