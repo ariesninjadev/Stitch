@@ -1,0 +1,13 @@
+<video id="video" controls autoplay></video>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<script>
+  const channel = prompt("Channel?");
+
+  fetch(`http://50.39.184.15:3001/twitch/${channel}`)
+    .then(res => res.json())
+    .then(data => {
+      const hls = new Hls();
+      hls.loadSource(data.proxy);
+      hls.attachMedia(document.getElementById('video'));
+    });
+</script>

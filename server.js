@@ -5,11 +5,11 @@ const https = require('https');
 const app = express();
 
 const SSL_OPTIONS = {
-  key: fs.readFileSync('./certs/server.key'),
-  cert: fs.readFileSync('./certs/server.cert')
+  key: fs.readFileSync('/etc/letsencrypt/live/api.ninjam.us/privkey.pem'),
+  cert: fs.readFileSync('/etc/letsencrypt/live/api.ninjam.us/cert.pem')
 };
 
-const PORT = 8443;
+const PORT = 3001;
 
 app.get('/twitch/:channel', (req, res) => {
   const channel = req.params.channel;
@@ -23,7 +23,7 @@ app.get('/twitch/:channel', (req, res) => {
 
     const m3u8 = stdout.trim();
     const encoded = Buffer.from(m3u8).toString('base64');
-    const proxyUrl = `http://localhost:3000/proxy/${encoded}.m3u8`;
+    const proxyUrl = `https://api.ninjam.us:3000/proxy/${encoded}.m3u8`;
 
     return res.json({ proxy: proxyUrl });
   });
