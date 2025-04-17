@@ -5,8 +5,8 @@ const https = require('https');
 const app = express();
 
 const SSL_OPTIONS = {
-  key: fs.readFileSync('/etc/letsencrypt/live/api.ninjam.us/privkey.pem'),
-  cert: fs.readFileSync('/etc/letsencrypt/live/api.ninjam.us/cert.pem')
+  key: fs.readFileSync('./certs/privkey.pem'),
+  cert: fs.readFileSync('./certs/fullchain.pem'),
 };
 
 const PORT = 3001;
