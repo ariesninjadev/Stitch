@@ -1,12 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
-  <title>Stitch v1.2.5</title>
+  <title>Stitch</title>
+  <!-- Add favicon -->
+  <link rel="icon" type="image/png" href="./resources/img/stitch-logo-transparent.png">
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="./resources/css/main.css"/>
+  <link rel="stylesheet" href="./resources/css/main.css" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
+
 <body>
   <!-- Auth Loading Screen -->
   <div id="auth-loading">
@@ -18,7 +26,11 @@
   </div>
 
   <div id="main-content">
-    <h1>Stitch</h1>
+    <div class="header">
+      <!-- Add logo image -->
+      <img src="./resources/img/stitch-logo-transparent.png" alt="Stitch" class="logo-image">
+      <h1>Stitch</h1>
+    </div>
 
     <form id="form">
       <input type="text" id="channelInput" placeholder="Enter Twitch channel" />
@@ -28,10 +40,23 @@
     <div class="status" id="status">Idle...</div>
 
     <div id="video-container">
+      <div id="stream-loading-overlay" class="stream-loading-overlay">
+        <div class="loading-content">
+          <div class="stream-spinner"></div>
+          <div class="loading-text">Loading stream...</div>
+          <div class="loading-explanation">Twitch streams take about 15 seconds to setup</div>
+          <div class="countdown-timer" id="countdown-timer">15</div>
+        </div>
+      </div>
+      <div id="audio-notification" class="audio-notification">
+        <i class="fa-solid fa-volume-xmark"></i>
+        <span id="audio-notification-text">Stream is muted. Click anywhere to unmute.</span>
+        <button id="dismiss-audio-notice" class="dismiss-button">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
       <video id="video" autoplay muted></video>
-      <!-- ...existing code... -->
       <div class="custom-controls">
-        <!-- Remove the seekbar container entirely -->
         <div class="controls-row">
           <div class="left-controls">
             <button class="control-button" id="playPauseBtn"><i class="fa-solid fa-play"></i></button>
@@ -46,9 +71,11 @@
       </div>
     </div>
 
-    <!-- Add Stream Directory -->
     <div class="stream-directory">
       <h2>FIRST FRC Worlds Streams</h2>
+      <!-- button to switch to Stitchday page -->
+      <button onclick="location.href = '/gameday'" style="background-color:#47ffa9;color:rgb(0, 0, 0);">Switch to Stitchday</button>
+      <br><br>
       <div class="stream-grid">
         <div class="stream-card" data-channel="firstinspires_archimedes">
           <div class="stream-thumbnail">
@@ -59,7 +86,7 @@
             <div class="stream-channel">firstinspires_archimedes</div>
           </div>
         </div>
-        
+
         <div class="stream-card" data-channel="firstinspires_curie">
           <div class="stream-thumbnail">
             <i class="fa-solid fa-trophy"></i>
@@ -69,7 +96,7 @@
             <div class="stream-channel">firstinspires_curie</div>
           </div>
         </div>
-        
+
         <div class="stream-card" data-channel="firstinspires_daly">
           <div class="stream-thumbnail">
             <i class="fa-solid fa-trophy"></i>
@@ -79,7 +106,7 @@
             <div class="stream-channel">firstinspires_daly</div>
           </div>
         </div>
-        
+
         <div class="stream-card" data-channel="firstinspires_galileo">
           <div class="stream-thumbnail">
             <i class="fa-solid fa-trophy"></i>
@@ -89,7 +116,7 @@
             <div class="stream-channel">firstinspires_galileo</div>
           </div>
         </div>
-        
+
         <div class="stream-card" data-channel="firstinspires_hopper">
           <div class="stream-thumbnail">
             <i class="fa-solid fa-trophy"></i>
@@ -99,7 +126,7 @@
             <div class="stream-channel">firstinspires_hopper</div>
           </div>
         </div>
-        
+
         <div class="stream-card" data-channel="firstinspires_johnson">
           <div class="stream-thumbnail">
             <i class="fa-solid fa-trophy"></i>
@@ -109,7 +136,7 @@
             <div class="stream-channel">firstinspires_johnson</div>
           </div>
         </div>
-        
+
         <div class="stream-card" data-channel="firstinspires_milstein">
           <div class="stream-thumbnail">
             <i class="fa-solid fa-trophy"></i>
@@ -119,7 +146,7 @@
             <div class="stream-channel">firstinspires_milstein</div>
           </div>
         </div>
-        
+
         <div class="stream-card" data-channel="firstinspires_newton">
           <div class="stream-thumbnail">
             <i class="fa-solid fa-trophy"></i>
@@ -132,9 +159,22 @@
       </div>
     </div>
 
+    <footer class="site-footer">
+      <div class="footer-content">
+        <div class="footer-logo">
+          <img src="./resources/img/stitch-logo-transparent.png" alt="Stitch Logo" class="footer-logo-img">
+        </div>
+        <div class="footer-info">
+          <p>&copy; 2025 NJM. All rights reserved.</p>
+          <p class="version">Stitch v1.3.0</p>
+        </div>
+      </div>
+    </footer>
+
   </div>
 
-<script src="./resources/js/main.js"></script>
+  <script src="./resources/js/main.js"></script>
 
 </body>
+
 </html>

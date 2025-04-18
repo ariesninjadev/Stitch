@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>Stitch - Login</title>
+  <!-- Add favicon -->
+  <link rel="icon" type="image/png" href="../resources/img/stitch-logo-transparent.png">
   <link rel="stylesheet" href="../resources/css/main.css"/>
   <style>
     .login-container {
@@ -19,6 +21,15 @@
     .logo {
       margin-bottom: 3rem;
       text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .logo img {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 1rem;
     }
     
     .logo h1 {
@@ -59,21 +70,32 @@
       width: 100%;
     }
     
-    .email-input {
-      width: calc(100% - 2rem);
-      background-color: rgba(14, 14, 16, 0.7);
-      border: 1px solid #555;
-      color: #eee;
+    .google-login-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background-color: #ffffff;
+      color: #757575;
+      border: 1px solid #ddd;
       padding: 0.8rem 1rem;
+      font-size: 1.1rem;
+      font-weight: 500;
       border-radius: 8px;
-      font-size: 1rem;
-      transition: border-color 0.3s ease;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+      box-sizing: border-box;
     }
     
-    .email-input:focus {
-      outline: none;
-      border-color: #47ffa9;
-      box-shadow: 0 0 0 2px rgba(71, 255, 169, 0.2);
+    .google-login-button:hover {
+      background-color: #f5f5f5;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    
+    .google-login-button img {
+      width: 24px;
+      height: 24px;
     }
     
     .login-button {
@@ -112,11 +134,142 @@
       color: #47ffa9;
       min-height: 1.2rem;
     }
+    
+    .site-footer {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      padding: 1rem;
+      background-color: rgba(14, 14, 16, 0.8);
+      text-align: center;
+    }
+    
+    .footer-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      font-size: 0.8rem;
+      color: #777;
+    }
+    
+    .footer-logo-img {
+      width: 24px;
+      height: 24px;
+    }
+    
+    .version {
+      font-size: 0.7rem;
+      opacity: 0.8;
+    }
+
+    .warning-container {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      width: 90%;
+      max-width: 400px;
+      background-color: rgba(40, 40, 45, 0.95);
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      border-left: 4px solid #ff4747;
+      animation: slideDown 0.3s ease-out forwards;
+    }
+    
+    .warning-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 15px;
+      border-bottom: 1px solid rgba(255, 71, 71, 0.2);
+    }
+    
+    .warning-title {
+      color: #ff4747;
+      font-weight: 600;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .warning-title svg {
+      width: 20px;
+      height: 20px;
+    }
+    
+    .warning-close {
+      background: transparent;
+      border: none;
+      color: #aaa;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 0;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.2s ease;
+    }
+    
+    .warning-close:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+    
+    .warning-content {
+      padding: 15px;
+    }
+    
+    .warning-messages {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .warning-message {
+      color: #eee;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+    
+    .warning-message:last-child {
+      margin-bottom: 0;
+    }
+    
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -20px);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+    }
+    
+    @keyframes fadeOut {
+      from {
+        opacity: 1;
+      }
+      to {
+        opacity: 0;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="login-container">
     <div class="logo">
+      <!-- Add logo image -->
+      <img src="../resources/img/stitch-logo-transparent.png" alt="Stitch Logo">
       <h1>Stitch</h1>
       <p>Your streamlined viewing experience</p>
     </div>
@@ -124,26 +277,16 @@
     <div class="login-card">
       <h2 class="login-title">Sign in to continue</h2>
       
-      <form id="login-form" class="login-form">
+      <div class="login-form">
         <div class="input-group">
-          <input 
-            type="email" 
-            id="email-input" 
-            class="email-input" 
-            placeholder="Enter your email address" 
-            required
-            autocomplete="email"
-          >
-        </div>
-        
-        <div class="input-group">
-          <button type="submit" id="login-button" class="login-button">
-            Continue
+          <button type="button" id="google-login-button" class="google-login-button" onclick="googleSignIn()">
+            <img src="../resources/img/google-logo.svg" alt="Google logo">
+            <span>Continue with Google</span>
           </button>
         </div>
         
         <div id="status-message" class="status-message"></div>
-      </form>
+      </div>
       
       <p class="footer-text">
         By signing in, you agree to our <a href="/terms">Terms of Service</a>
@@ -151,28 +294,161 @@
     </div>
   </div>
   
+  <!-- Add footer -->
+  <div class="site-footer">
+    <div class="footer-content">
+      <div class="footer-logo">
+        <img src="../resources/img/stitch-logo-transparent.png" alt="Stitch Logo" class="footer-logo-img">
+      </div>
+      <div class="footer-info">
+        <span>&copy; 2025 NJM. All rights reserved.</span>
+        <span class="version">Stitch v1.3.0</span>
+      </div>
+    </div>
+  </div>
+  <script type="module">
+		// Import the functions you need from the SDKs you need
+		import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+		import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-analytics.js";
+		import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app-check.js";
+		import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+		// TODO: Add SDKs for Firebase products that you want to use
+		// https://firebase.google.com/docs/web/setup#available-libraries
+
+		// Your web app's Firebase configuration
+		// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+		const firebaseConfig = {
+			apiKey: "AIzaSyAyEV-fn6YmdshQtxQ7nPMJ4taIF-RpI48",
+			authDomain: "njmsso.firebaseapp.com",
+			projectId: "njmsso",
+			storageBucket: "njmsso.firebasestorage.app",
+			messagingSenderId: "613344366652",
+			appId: "1:613344366652:web:08583213f10c3fd036f339",
+			measurementId: "G-D3P4KR36NV"
+		};
+
+		const app = initializeApp(firebaseConfig);
+		const analytics = getAnalytics(app);
+
+		self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+		const appCheck = initializeAppCheck(app, {
+			provider: new ReCaptchaV3Provider('6LfR0RErAAAAAH-KiCb7-yB-6EDP7U65H3CuCPXd')
+		});
+
+		const auth = getAuth(app);
+
+		window.auth = auth;
+		window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+		window.signInWithPopup = signInWithPopup;
+		window.GoogleAuthProvider = GoogleAuthProvider;
+
+	</script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      const loginForm = document.getElementById('login-form');
-      const emailInput = document.getElementById('email-input');
       const statusMessage = document.getElementById('status-message');
-      
-      loginForm.addEventListener('submit', function(event) {
-        event.preventDefault();
+
+      window.showWarning = function(title, messages) {
+        // Remove any existing warnings
+        const existingWarnings = document.querySelectorAll('.warning-container');
+        existingWarnings.forEach(warning => {
+          warning.remove();
+        });
         
-        const email = emailInput.value.trim();
+        // Create warning container
+        const warningContainer = document.createElement('div');
+        warningContainer.className = 'warning-container';
         
-        if (email) {
-          statusMessage.textContent = 'Logging in...';
-          localStorage.setItem('uid', email); // Store email in local storage
+        // Create warning header
+        const warningHeader = document.createElement('div');
+        warningHeader.className = 'warning-header';
+        
+        // Create warning title with icon
+        const warningTitle = document.createElement('div');
+        warningTitle.className = 'warning-title';
+        warningTitle.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-2a8 8 0 1 0 0-16 8 8 0 0 0 0 16zm-1-5h2v2h-2v-2zm0-8h2v6h-2V7z"/>
+          </svg>
+          ${title}
+        `;
+        
+        // Create close button
+        const closeButton = document.createElement('button');
+        closeButton.className = 'warning-close';
+        closeButton.innerHTML = '×';
+        closeButton.setAttribute('aria-label', 'Close');
+        closeButton.onclick = function() {
+          warningContainer.style.animation = 'fadeOut 0.3s forwards';
           setTimeout(() => {
-            // Redirect to the main page after successful login
-            window.location.href = '/';
-          }, 600);
-        } else {
-          statusMessage.textContent = 'Please enter a valid email address.';
-        }
-      });
+            warningContainer.remove();
+          }, 300);
+        };
+        
+        warningHeader.appendChild(warningTitle);
+        warningHeader.appendChild(closeButton);
+        
+        // Create warning content
+        const warningContent = document.createElement('div');
+        warningContent.className = 'warning-content';
+        
+        // Create warning messages list
+        const warningMessages = document.createElement('ul');
+        warningMessages.className = 'warning-messages';
+        
+        // Add each message
+        messages.forEach(message => {
+          const messageItem = document.createElement('li');
+          messageItem.className = 'warning-message';
+          messageItem.textContent = message;
+          warningMessages.appendChild(messageItem);
+        });
+        
+        warningContent.appendChild(warningMessages);
+        
+        // Assemble warning container
+        warningContainer.appendChild(warningHeader);
+        warningContainer.appendChild(warningContent);
+        
+        // Add to document
+        document.body.appendChild(warningContainer);
+        
+        // Auto-dismiss after 5 seconds
+        setTimeout(() => {
+          if (document.body.contains(warningContainer)) {
+            warningContainer.style.animation = 'fadeOut 0.3s forwards';
+            setTimeout(() => {
+              if (document.body.contains(warningContainer)) {
+                warningContainer.remove();
+              }
+            }, 300);
+          }
+        }, 5000);
+      };
+      
+      window.googleSignIn = function() {
+        statusMessage.textContent = 'Logging in with Google...';
+
+        const provider = new GoogleAuthProvider();
+			signInWithPopup(auth, provider)
+				.then((result) => {
+					const credential = result.credential;
+					// const token = credential.accessToken;
+					// const user = result.user;
+					console.log(result);
+					if (result.user != null) {
+						localStorage.setItem("uid", result.user.email);
+            localStorage.setItem("secVersion", 2);
+						window.location.replace("/");
+					} else {
+						// If user is null, show error message
+						showWarning("Error", ["Google authentication failed."]);
+					}
+				})
+				.catch((error) => {
+					showWarning("Error", ["Google authentication failed."]);
+				});
+        
+      };
     });
   </script>
 </body>

@@ -21,6 +21,7 @@ button {
     border-radius: 6px;
     margin: 0;
     border: none;
+    cursor: pointer;
 }
 
 input {
@@ -393,3 +394,212 @@ input {
         height: 80px;
     }
 }
+
+.stream-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgb(14, 14, 16);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.stream-loading-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.loading-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stream-spinner {
+    width: 60px;
+    height: 60px;
+    border: 5px solid rgba(71, 255, 169, 0.3);
+    border-radius: 50%;
+    border-top-color: #47ffa9;
+    animation: spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    margin-bottom: 20px;
+}
+
+.loading-text {
+    font-size: 1.4rem;
+    color: #47ffa9;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(71, 255, 169, 0.5);
+}
+
+.loading-explanation {
+    font-size: 1rem;
+    color: #aaa;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.countdown-timer {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #47ffa9;
+    margin-top: 15px;
+    font-family: monospace;
+    min-width: 60px;
+    text-align: center;
+    text-shadow: 0 0 10px rgba(71, 255, 169, 0.5);
+}
+
+/* Mobile responsive adjustments for loading overlay */
+@media (max-width: 768px) {
+    .stream-spinner {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .loading-text {
+        font-size: 1.2rem;
+    }
+    
+    .loading-explanation {
+        font-size: 0.9rem;
+    }
+    
+    .countdown-timer {
+        font-size: 2rem;
+    }
+}
+
+.audio-notification {
+    position: absolute;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 8px 15px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 10;
+    border: 1px solid rgba(71, 255, 169, 0.5);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    max-width: 90%;
+}
+
+.audio-notification.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.audio-notification i {
+    color: #47ffa9;
+    font-size: 1.1rem;
+}
+
+.dismiss-button {
+    background: transparent;
+    border: none;
+    color: #aaa;
+    cursor: pointer;
+    padding: 4px;
+    margin-left: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.dismiss-button:hover {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Mobile responsive adjustments for audio notification */
+@media (max-width: 768px) {
+    .audio-notification {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+    }
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .logo-image {
+    width: 50px;
+    height: 50px;
+  }
+  
+  /* Footer styles */
+  .site-footer {
+    margin-top: 3rem;
+    padding: 1.5rem;
+    border-top: 1px solid #333;
+    width: 100%;
+    max-width: 900px;
+  }
+  
+  .footer-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+  }
+  
+  .footer-logo-img {
+    width: 30px;
+    height: 30px;
+    opacity: 0.7;
+  }
+  
+  .footer-info {
+    font-size: 0.8rem;
+    color: #777;
+    text-align: center;
+  }
+  
+  .version {
+    font-size: 0.7rem;
+    opacity: 0.8;
+    margin-top: 0.3rem;
+  }
+  
+  /* Mobile responsive adjustments */
+  @media (max-width: 768px) {
+    .header {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .logo-image {
+      width: 40px;
+      height: 40px;
+    }
+    
+    .site-footer {
+      padding: 1rem;
+    }
+    
+    .footer-content {
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+  }
