@@ -68,31 +68,31 @@
 
 
 	<script>
-		async function checkAuth() {
-			try {
-				// Try to get user ID from local storage, cookie, etc.
-				// This is a placeholder - implement your actual UID retrieval method
-				const uid = localStorage.getItem('uid');
-				const sv = localStorage.getItem('secVersion');
+		// async function checkAuth() {
+		// 	try {
+		// 		// Try to get user ID from local storage, cookie, etc.
+		// 		// This is a placeholder - implement your actual UID retrieval method
+		// 		const uid = localStorage.getItem('uid');
+		// 		const sv = localStorage.getItem('secVersion');
 
-				if ((!uid) || sv != 2) {
-					location.href = '/login'; // Redirect to login page if no UID found
-					throw new Error('No user ID found');
-				}
+		// 		if ((!uid) || sv != 2) {
+		// 			location.href = '/login'; // Redirect to login page if no UID found
+		// 			throw new Error('No user ID found');
+		// 		}
 
-				const urlEncodedUid = encodeURIComponent(uid);
+		// 		const urlEncodedUid = encodeURIComponent(uid);
 
-				const authRes = await fetch(`https://api.ninjam.us:3001/auth/${urlEncodedUid}`);
-				const authData = await authRes.json();
+		// 		const authRes = await fetch(`https://api.ninjam.us:3001/auth/${urlEncodedUid}`);
+		// 		const authData = await authRes.json();
 
-				if (!authData.authenticated) {
-					throw new Error('Authentication failed');
-				}
-			} catch (err) {
-				location.replace('/');
-				console.error('Error during authentication:', err);
-			}
-		}
+		// 		if (!authData.authenticated) {
+		// 			throw new Error('Authentication failed');
+		// 		}
+		// 	} catch (err) {
+		// 		location.replace('/');
+		// 		console.error('Error during authentication:', err);
+		// 	}
+		// }
 
 		// Helper function to get cookie value
 		function getCookie(name) {
